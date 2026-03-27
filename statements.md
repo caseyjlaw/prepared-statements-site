@@ -4,26 +4,14 @@ Edit this file to add or change options. Each statement is a level-2 heading (`#
 
 ---
 
-## Request for information
+## Please Keep Our Streets Safe
 
-I am writing to request additional information regarding your recent communication. Please reply at your earliest convenience.
+We need to preserve safety features. Please do that.
 
 Thank you.
 
-## Scheduling follow-up
+## We Need Safe Routes to School 
 
-I would like to schedule a brief follow-up to discuss next steps. Please let me know which times work best for you this week or next.
+Children need safe routes to school. When our streets only consider cars, they are not safe and do not support childhood independence.
 
-Thank you for your time.
-
-## Formal objection
-
-I am formally objecting to the proposal as currently drafted. I request that my objection be recorded and that no action be taken until we have had an opportunity to respond in writing.
-
-Sincerely,
-
-## Thank you and confirmation
-
-Thank you for your message. This email confirms that I have received your note and will review the contents and respond as appropriate.
-
-Best regards,
+Thank you.
