@@ -1,29 +1,32 @@
 (function () {
   const cfg = window.PREPARED_STATEMENTS_CONFIG || {};
-  const recipient = cfg.recipientEmail || "you@example.com";
-  const defaultSubject = cfg.defaultSubject || "Complete streets advocacy";
-  const advocacyHeadline =
-    cfg.advocacyHeadline ||
-    "🚲🌳✨ Let your representatives know — complete streets & car-free living matter!";
+  const DATA_URL = cfg.dataUrl || "statements.json";
 
-  const senderOptionsRaw = cfg.senderEmailOptions;
-  const senderOptions =
-    Array.isArray(senderOptionsRaw) && senderOptionsRaw.length > 0
-      ? senderOptionsRaw.map(String)
-      : ["test@southpasadenaca.gov"];
-  const defaultSender =
-    cfg.defaultSenderEmail && senderOptions.includes(cfg.defaultSenderEmail)
-      ? cfg.defaultSenderEmail
-      : senderOptions[0];
+  const FALLBACK = {
+    recipientEmail: "you@example.com",
+    defaultSubject: "Complete streets advocacy",
+    advocacyHeadline:
+      "🚲🌳✨ Let your representatives know — complete streets & car-free living matter!",
+    statements: [],
+    senderOptions: ["test@southpasadenaca.gov"],
+    defaultSender: "test@southpasadenaca.gov",
+  };
+
+  const site = {
+    recipientEmail: FALLBACK.recipientEmail,
+    defaultSubject: FALLBACK.defaultSubject,
+    advocacyHeadline: FALLBACK.advocacyHeadline,
+    senderOptions: [...FALLBACK.senderOptions],
+    defaultSender: FALLBACK.defaultSender,
+  };
 
   const messageField = document.getElementById("message");
+  const subjectField = document.getElementById("email-subject");
   const senderSelect = document.getElementById("sender-email");
   const composeBtn = document.getElementById("compose");
   const statusEl = document.getElementById("status");
   const templatePickerEl = document.getElementById("template-picker");
   const advocacyEl = document.getElementById("advocacy-headline");
-
-  let activeTemplateIndex = null;
 
   function setStatus(message, isError) {
     statusEl.textContent = message;
@@ -32,53 +35,116 @@
 
   function applyAdvocacyHeadline() {
     if (advocacyEl) {
-      advocacyEl.textContent = advocacyHeadline;
+      advocacyEl.textContent = site.advocacyHeadline;
     }
   }
 
   function populateSenderSelect() {
     senderSelect.innerHTML = "";
-    senderOptions.forEach((addr) => {
+    site.senderOptions.forEach((addr) => {
       const opt = document.createElement("option");
       opt.value = addr;
       opt.textContent = addr;
       senderSelect.appendChild(opt);
     });
-    senderSelect.value = defaultSender;
+    if (site.senderOptions.includes(site.defaultSender)) {
+      senderSelect.value = site.defaultSender;
+    } else if (site.senderOptions.length > 0) {
+      senderSelect.value = site.senderOptions[0];
+      site.defaultSender = site.senderOptions[0];
+    }
   }
 
-  function parseStatements(markdown) {
-    const lines = markdown.split(/\r?\n/);
-    const statements = [];
-    let current = null;
-    let bodyLines = [];
-
-    function flush() {
-      if (!current) return;
-      const body = bodyLines.join("\n").trim();
-      statements.push({ title: current, body });
-      current = null;
-      bodyLines = [];
+  function parseSiteJson(text) {
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      throw new Error(
+        "statements.json must contain valid JSON. Check for trailing commas or missing quotes."
+      );
     }
 
-    for (const line of lines) {
-      const h2 = line.match(/^##\s+(.+)/);
-      if (h2) {
-        flush();
-        current = h2[1].trim();
-        continue;
+    if (!data || typeof data !== "object") {
+      throw new Error("statements.json must be a JSON object at the root.");
+    }
+
+    const statements = data.statements;
+    if (!Array.isArray(statements) || statements.length === 0) {
+      throw new Error('JSON must include a non-empty "statements" array.');
+    }
+
+    const normalized = [];
+    for (let i = 0; i < statements.length; i++) {
+      const s = statements[i];
+      if (!s || typeof s !== "object") {
+        throw new Error(`statements[${i}] must be an object with "title" and "body".`);
       }
-      if (current !== null) {
-        if (line.startsWith("# ")) continue;
-        bodyLines.push(line);
+      const title = String(s.title || "").trim();
+      const body = String(s.body || "").trim();
+      if (!title || !body) {
+        throw new Error(`statements[${i}] needs non-empty "title" and "body".`);
       }
+      normalized.push({ title, body });
     }
-    flush();
 
-    if (statements.length === 0) {
-      throw new Error('No statements found. Add sections with "## Title" in statements.md.');
+    const emailSection = data.emailAddressOptions;
+    if (!emailSection || typeof emailSection !== "object") {
+      throw new Error('JSON must include an "emailAddressOptions" object.');
     }
-    return statements;
+
+    const rawOptions = emailSection.options || emailSection.addresses;
+    if (!Array.isArray(rawOptions) || rawOptions.length === 0) {
+      throw new Error(
+        'emailAddressOptions must include a non-empty "options" (or "addresses") array.'
+      );
+    }
+
+    const senderOptions = rawOptions.map((a) => String(a).trim()).filter(Boolean);
+    if (senderOptions.length === 0) {
+      throw new Error("emailAddressOptions.options must contain at least one email.");
+    }
+
+    let defaultSender = String(emailSection.default || "").trim();
+    if (!defaultSender || !senderOptions.includes(defaultSender)) {
+      defaultSender = senderOptions[0];
+    }
+
+    return {
+      advocacyHeadline:
+        typeof data.advocacyHeadline === "string" && data.advocacyHeadline.trim()
+          ? data.advocacyHeadline.trim()
+          : FALLBACK.advocacyHeadline,
+      recipientEmail:
+        typeof data.recipientEmail === "string" && data.recipientEmail.trim()
+          ? data.recipientEmail.trim()
+          : FALLBACK.recipientEmail,
+      defaultSubject:
+        typeof data.defaultSubject === "string" && data.defaultSubject.trim()
+          ? data.defaultSubject.trim()
+          : FALLBACK.defaultSubject,
+      statements: normalized,
+      senderOptions,
+      defaultSender,
+    };
+  }
+
+  function applySiteData(parsed) {
+    site.advocacyHeadline = cfg.advocacyHeadline ?? parsed.advocacyHeadline;
+    site.recipientEmail = cfg.recipientEmail ?? parsed.recipientEmail;
+    site.defaultSubject = cfg.defaultSubject ?? parsed.defaultSubject;
+    site.senderOptions =
+      Array.isArray(cfg.senderEmailOptions) && cfg.senderEmailOptions.length > 0
+        ? cfg.senderEmailOptions.map(String)
+        : parsed.senderOptions;
+    const desiredDefault = cfg.defaultSenderEmail ?? parsed.defaultSender;
+    site.defaultSender = site.senderOptions.includes(desiredDefault)
+      ? desiredDefault
+      : site.senderOptions[0];
+
+    window.__STATEMENTS__ = parsed.statements;
+    applyAdvocacyHeadline();
+    populateSenderSelect();
   }
 
   function firstMeaningfulLine(body) {
@@ -114,12 +180,13 @@
   function selectTemplate(index) {
     const list = window.__STATEMENTS__;
     if (!list || !list[index]) return;
-    activeTemplateIndex = index;
-    messageField.value = list[index].body;
+    const st = list[index];
+    subjectField.value = st.title;
+    messageField.value = st.body;
     templatePickerEl.querySelectorAll(".template-option").forEach((el, idx) => {
       el.classList.toggle("is-selected", idx === index);
     });
-    messageField.focus();
+    subjectField.focus();
   }
 
   function buildBody(messageText, senderEmail) {
@@ -146,34 +213,18 @@
     a.remove();
   }
 
-  function subjectForCompose() {
-    const list = window.__STATEMENTS__;
-    if (
-      activeTemplateIndex !== null &&
-      list &&
-      list[activeTemplateIndex] &&
-      list[activeTemplateIndex].title
-    ) {
-      return `${defaultSubject}: ${list[activeTemplateIndex].title}`;
-    }
-    return defaultSubject;
-  }
-
-  async function loadStatements() {
-    setStatus("Loading templates…", false);
-    const res = await fetch("statements.md", { cache: "no-store" });
+  async function loadSiteData() {
+    setStatus("Loading…", false);
+    const res = await fetch(DATA_URL, { cache: "no-store" });
     if (!res.ok) {
-      throw new Error(`Could not load statements.md (${res.status}).`);
+      throw new Error(`Could not load ${DATA_URL} (${res.status}).`);
     }
-    const text = await res.text();
-    const statements = parseStatements(text);
-    window.__STATEMENTS__ = statements;
-    populateTemplatePicker(statements);
+    const text = (await res.text()).trim();
+    const parsed = parseSiteJson(text);
+    applySiteData(parsed);
+    populateTemplatePicker(window.__STATEMENTS__);
     setStatus("Ready when you are — pick a template or write your message, then send.", false);
   }
-
-  applyAdvocacyHeadline();
-  populateSenderSelect();
 
   composeBtn.addEventListener("click", () => {
     if (!window.__STATEMENTS__ || window.__STATEMENTS__.length === 0) {
@@ -195,9 +246,9 @@
       return;
     }
 
-    const subject = subjectForCompose();
+    const subjectLine = subjectField.value.trim() || site.defaultSubject;
     const body = buildBody(bodyText, senderEmail);
-    const href = buildMailto(recipient, subject, body);
+    const href = buildMailto(site.recipientEmail, subjectLine, body);
 
     if (href.length > 2000) {
       setStatus(
@@ -214,8 +265,8 @@
     openMailto(href);
   });
 
-  loadStatements().catch((err) => {
+  loadSiteData().catch((err) => {
     console.error(err);
-    setStatus(err.message || "Failed to load templates.", true);
+    setStatus(err.message || "Failed to load site data.", true);
   });
 })();

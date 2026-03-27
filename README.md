@@ -1,12 +1,12 @@
 # Prepared statements (static site)
 
-A small static site for GitHub Pages. Visitors choose a prepared statement (defined in Markdown), enter their email, and open a pre-filled message in their mail app to send to a fixed address.
+A small static site for GitHub Pages. Visitors pick a template, edit the subject and message, choose a preset contact email, and open a pre-filled message in their mail app.
 
 ## How it works
 
-- **`statements.md`** — Each `## Heading` is a statement title; lines below the heading are the message body until the next `##`.
-- **`config.js`** — Set `recipientEmail` to the inbox that should receive these messages. Optionally change `defaultSubject`.
-- **`index.html`**, **`app.js`**, **`styles.css`** — The page loads the Markdown over HTTP, parses it in the browser, and builds a `mailto:` link (subject + body). The visitor’s email is included at the top of the body so the recipient can reply.
+- **`statements.json`** — Site copy and data: `advocacyHeadline`, `recipientEmail`, `defaultSubject`, `statements` (each with `title` and `body`), and `emailAddressOptions` (`options` + `default`).
+- **`config.js`** — Optional overrides while developing (see comment in file). Defaults are read from `statements.json`.
+- **`index.html`**, **`app.js`**, **`styles.css`** — The page loads `statements.json` over HTTP and builds a `mailto:` link. A preset contact address can be included in the body for replies.
 
 No server-side code runs on GitHub Pages; email is sent only when the user sends from their own client.
 
@@ -33,11 +33,11 @@ No server-side code runs on GitHub Pages; email is sent only when the user sends
 
 4. After a minute, the site will be at `https://caseyjlaw.github.io/<repo-name>/`.
 
-5. Edit **`config.js`** on GitHub or locally and push so `recipientEmail` is your real inbox.
+5. Edit **`statements.json`** on GitHub or locally and push so `recipientEmail` and templates match your project.
 
 ## Local preview
 
-From the project folder (`~/code/prepared-statements-site` on your machine), run any static file server so `fetch('statements.md')` works (opening `index.html` directly as a `file://` URL may block the fetch):
+From the project folder (`~/code/prepared-statements-site` on your machine), run any static file server so `fetch('statements.json')` works (opening `index.html` directly as a `file://` URL may block the fetch):
 
 ```bash
 cd ~/code/prepared-statements-site

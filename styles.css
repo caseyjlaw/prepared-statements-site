@@ -149,7 +149,8 @@ label {
 }
 
 select,
-textarea {
+textarea,
+input[type="text"] {
   width: 100%;
   font: inherit;
   padding: 0.55rem 0.65rem;
@@ -166,7 +167,8 @@ textarea {
 }
 
 select:focus,
-textarea:focus {
+textarea:focus,
+input[type="text"]:focus {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
