@@ -117,7 +117,8 @@
     const list = window.__STATEMENTS__;
     if (!list || !list[index]) return;
     const st = list[index];
-    subjectField.value = st.title;
+    const useDefaultSubject = index === list.length - 1;
+    subjectField.value = useDefaultSubject ? site.defaultSubject : st.title;
     messageField.value = st.body;
     templatePickerEl.querySelectorAll(".template-option").forEach((el, idx) => {
       el.classList.toggle("is-selected", idx === index);
