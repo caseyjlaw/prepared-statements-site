@@ -1,21 +1,16 @@
 (function () {
   const cfg = window.PREPARED_STATEMENTS_CONFIG || {};
   const recipient = cfg.recipientEmail || "you@example.com";
-  const defaultSubject = cfg.defaultSubject || "Prepared statement";
+  const defaultSubject = cfg.defaultSubject || "Complete streets advocacy";
   const advocacyHeadline =
-    cfg.advocacyHeadline || "Placeholder: Let Your Representatives Know How You Feel";
-  const formInstructions = Array.isArray(cfg.formInstructions)
-    ? cfg.formInstructions
-    : [
-        typeof cfg.formInstructions === "string"
-          ? cfg.formInstructions
-          : "Click a template to load it, edit if needed, choose a contact email, then send.",
-      ];
+    cfg.advocacyHeadline ||
+    "🚲🌳✨ Let your representatives know — complete streets & car-free living matter!";
 
   const senderOptionsRaw = cfg.senderEmailOptions;
-  const senderOptions = Array.isArray(senderOptionsRaw) && senderOptionsRaw.length > 0
-    ? senderOptionsRaw.map(String)
-    : ["test@southpasadenaca.gov"];
+  const senderOptions =
+    Array.isArray(senderOptionsRaw) && senderOptionsRaw.length > 0
+      ? senderOptionsRaw.map(String)
+      : ["test@southpasadenaca.gov"];
   const defaultSender =
     cfg.defaultSenderEmail && senderOptions.includes(cfg.defaultSenderEmail)
       ? cfg.defaultSenderEmail
@@ -27,7 +22,6 @@
   const statusEl = document.getElementById("status");
   const templatePickerEl = document.getElementById("template-picker");
   const advocacyEl = document.getElementById("advocacy-headline");
-  const instructionsEl = document.getElementById("form-instructions");
 
   let activeTemplateIndex = null;
 
@@ -36,17 +30,9 @@
     statusEl.classList.toggle("error", Boolean(isError));
   }
 
-  function applyCopyFromConfig() {
+  function applyAdvocacyHeadline() {
     if (advocacyEl) {
       advocacyEl.textContent = advocacyHeadline;
-    }
-    if (instructionsEl) {
-      instructionsEl.innerHTML = "";
-      formInstructions.forEach((line) => {
-        const p = document.createElement("p");
-        p.textContent = line;
-        instructionsEl.appendChild(p);
-      });
     }
   }
 
@@ -183,10 +169,10 @@
     const statements = parseStatements(text);
     window.__STATEMENTS__ = statements;
     populateTemplatePicker(statements);
-    setStatus("Choose a template (optional), edit your message, then open your mail app.", false);
+    setStatus("Ready when you are — pick a template or write your message, then send.", false);
   }
 
-  applyCopyFromConfig();
+  applyAdvocacyHeadline();
   populateSenderSelect();
 
   composeBtn.addEventListener("click", () => {
@@ -197,7 +183,7 @@
 
     const bodyText = messageField.value.trim();
     if (!bodyText) {
-      setStatus("Add a message (pick a template or type your own).", true);
+      setStatus("Add a message (use a template or write your own).", true);
       messageField.focus();
       return;
     }
@@ -219,7 +205,10 @@
         true
       );
     } else {
-      setStatus("Opening your email app… If nothing happens, check popup or mail client settings.", false);
+      setStatus(
+        "Opening your email app… If nothing happens, check popup or mail client settings.",
+        false
+      );
     }
 
     openMailto(href);

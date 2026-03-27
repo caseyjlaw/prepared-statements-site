@@ -51,23 +51,6 @@ body {
   padding: 2.5rem 1.25rem 3rem;
 }
 
-header {
-  margin-bottom: 1.75rem;
-}
-
-h1 {
-  font-size: 1.6rem;
-  font-weight: 650;
-  letter-spacing: -0.02em;
-  margin: 0 0 0.35rem;
-}
-
-.lead {
-  margin: 0;
-  color: var(--muted);
-  font-size: 1rem;
-}
-
 .card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -76,28 +59,13 @@ h1 {
   padding: 1.5rem;
 }
 
-.advocacy-headline {
-  margin: 0 0 1rem;
-  font-size: 1.2rem;
+.advocacy-hero {
+  margin: 0 0 1.35rem;
+  font-size: 1.25rem;
   font-weight: 650;
-  line-height: 1.35;
+  line-height: 1.45;
   color: var(--text);
-}
-
-.form-instructions {
-  margin: 0 0 1.25rem;
-  padding-bottom: 1.1rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.form-instructions p {
-  margin: 0 0 0.65rem;
-  font-size: 0.95rem;
-  color: var(--muted);
-}
-
-.form-instructions p:last-child {
-  margin-bottom: 0;
+  letter-spacing: -0.015em;
 }
 
 .field-label-static {
@@ -211,35 +179,42 @@ textarea:focus {
   align-items: center;
 }
 
-button {
+.btn-send {
   font: inherit;
   font-weight: 600;
   cursor: pointer;
   border: none;
   border-radius: 999px;
-  padding: 0.55rem 1.15rem;
+  padding: 0.65rem 1.25rem;
   background: var(--accent);
   color: var(--accent-contrast);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  text-align: center;
+  max-width: 100%;
 }
 
-button:hover {
+.btn-send-main {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.btn-send-note {
+  font-size: 0.78rem;
+  font-weight: 500;
+  opacity: 0.92;
+  line-height: 1.25;
+  max-width: 22rem;
+}
+
+.btn-send:hover {
   filter: brightness(1.05);
 }
 
-button:active {
+.btn-send:active {
   transform: translateY(1px);
-}
-
-.hint {
-  font-size: 0.85rem;
-  color: var(--muted);
-  flex: 1 1 12rem;
-}
-
-footer {
-  margin-top: 2rem;
-  font-size: 0.85rem;
-  color: var(--muted);
 }
 
 #status {

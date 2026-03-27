@@ -3,21 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Prepared statements</title>
+    <title>Complete streets advocacy</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="wrap">
-      <header>
-        <h1>Prepared statements</h1>
-        <p class="lead">Send advocacy messages through your mail app using ready-made templates.</p>
-      </header>
+      <p id="advocacy-headline" class="advocacy-hero"></p>
 
       <main class="card">
-        <p id="advocacy-headline" class="advocacy-headline"></p>
-
-        <div id="form-instructions" class="form-instructions" aria-label="How to use this form"></div>
-
         <div class="field">
           <span id="template-picker-label" class="field-label-static">Templates</span>
           <div
@@ -36,7 +29,7 @@
             name="message"
             rows="10"
             spellcheck="true"
-            placeholder="Choose a template above, or type your message here."
+            placeholder="Pick a template or write your own message."
           ></textarea>
         </div>
 
@@ -49,18 +42,14 @@
         </div>
 
         <div class="actions">
-          <button type="button" id="compose">Open in email app</button>
-          <span class="hint">
-            Uses your device’s mail program; nothing is sent from this website.
-          </span>
+          <button type="button" id="compose" class="btn-send">
+            <span class="btn-send-main">Send email</span>
+            <span class="btn-send-note">(will send email via your client)</span>
+          </button>
         </div>
 
         <p id="status" role="status"></p>
       </main>
-
-      <footer>
-        Templates: <code>statements.md</code>. Recipient and options: <code>config.js</code>.
-      </footer>
     </div>
 
     <script src="config.js"></script>
