@@ -1,12 +1,12 @@
 # Prepared statements (static site)
 
-A small static site for GitHub Pages. Visitors pick a template, edit the subject and message, choose a preset contact email, and open a pre-filled message in their mail app.
+A small static site for GitHub Pages. Visitors pick a template, edit the subject and message, and open a pre-filled message in their mail app.
 
 ## How it works
 
-- **`statements.json`** — Site copy and data: `advocacyHeadline`, `recipientEmail`, `defaultSubject`, `statements` (each with `title` and `body`), and `emailAddressOptions` (`options` + `default`).
+- **`statements.json`** — Site copy and data: `advocacyHeadline`, `recipientEmail`, `defaultSubject`, and `statements` (each with `title` and `body`).
 - **`config.js`** — Optional overrides while developing (see comment in file). Defaults are read from `statements.json`.
-- **`index.html`**, **`app.js`**, **`styles.css`** — The page loads `statements.json` over HTTP and builds a `mailto:` link. A preset contact address can be included in the body for replies.
+- **`index.html`**, **`app.js`**, **`styles.css`** — The page loads `statements.json` over HTTP and builds a `mailto:` link.
 
 No server-side code runs on GitHub Pages; email is sent only when the user sends from their own client.
 

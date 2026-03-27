@@ -8,21 +8,16 @@
     advocacyHeadline:
       "🚲🌳✨ Let your representatives know — complete streets & car-free living matter!",
     statements: [],
-    senderOptions: ["test@southpasadenaca.gov"],
-    defaultSender: "test@southpasadenaca.gov",
   };
 
   const site = {
     recipientEmail: FALLBACK.recipientEmail,
     defaultSubject: FALLBACK.defaultSubject,
     advocacyHeadline: FALLBACK.advocacyHeadline,
-    senderOptions: [...FALLBACK.senderOptions],
-    defaultSender: FALLBACK.defaultSender,
   };
 
   const messageField = document.getElementById("message");
   const subjectField = document.getElementById("email-subject");
-  const senderSelect = document.getElementById("sender-email");
   const composeBtn = document.getElementById("compose");
   const statusEl = document.getElementById("status");
   const templatePickerEl = document.getElementById("template-picker");
@@ -36,22 +31,6 @@
   function applyAdvocacyHeadline() {
     if (advocacyEl) {
       advocacyEl.textContent = site.advocacyHeadline;
-    }
-  }
-
-  function populateSenderSelect() {
-    senderSelect.innerHTML = "";
-    site.senderOptions.forEach((addr) => {
-      const opt = document.createElement("option");
-      opt.value = addr;
-      opt.textContent = addr;
-      senderSelect.appendChild(opt);
-    });
-    if (site.senderOptions.includes(site.defaultSender)) {
-      senderSelect.value = site.defaultSender;
-    } else if (site.senderOptions.length > 0) {
-      senderSelect.value = site.senderOptions[0];
-      site.defaultSender = site.senderOptions[0];
     }
   }
 
@@ -88,28 +67,6 @@
       normalized.push({ title, body });
     }
 
-    const emailSection = data.emailAddressOptions;
-    if (!emailSection || typeof emailSection !== "object") {
-      throw new Error('JSON must include an "emailAddressOptions" object.');
-    }
-
-    const rawOptions = emailSection.options || emailSection.addresses;
-    if (!Array.isArray(rawOptions) || rawOptions.length === 0) {
-      throw new Error(
-        'emailAddressOptions must include a non-empty "options" (or "addresses") array.'
-      );
-    }
-
-    const senderOptions = rawOptions.map((a) => String(a).trim()).filter(Boolean);
-    if (senderOptions.length === 0) {
-      throw new Error("emailAddressOptions.options must contain at least one email.");
-    }
-
-    let defaultSender = String(emailSection.default || "").trim();
-    if (!defaultSender || !senderOptions.includes(defaultSender)) {
-      defaultSender = senderOptions[0];
-    }
-
     return {
       advocacyHeadline:
         typeof data.advocacyHeadline === "string" && data.advocacyHeadline.trim()
@@ -124,8 +81,6 @@
           ? data.defaultSubject.trim()
           : FALLBACK.defaultSubject,
       statements: normalized,
-      senderOptions,
-      defaultSender,
     };
   }
 
@@ -133,23 +88,9 @@
     site.advocacyHeadline = cfg.advocacyHeadline ?? parsed.advocacyHeadline;
     site.recipientEmail = cfg.recipientEmail ?? parsed.recipientEmail;
     site.defaultSubject = cfg.defaultSubject ?? parsed.defaultSubject;
-    site.senderOptions =
-      Array.isArray(cfg.senderEmailOptions) && cfg.senderEmailOptions.length > 0
-        ? cfg.senderEmailOptions.map(String)
-        : parsed.senderOptions;
-    const desiredDefault = cfg.defaultSenderEmail ?? parsed.defaultSender;
-    site.defaultSender = site.senderOptions.includes(desiredDefault)
-      ? desiredDefault
-      : site.senderOptions[0];
 
     window.__STATEMENTS__ = parsed.statements;
     applyAdvocacyHeadline();
-    populateSenderSelect();
-  }
-
-  function firstMeaningfulLine(body) {
-    const line = body.split(/\r?\n/).find((l) => l.trim().length > 0);
-    return (line || body).trim();
   }
 
   function populateTemplatePicker(statements) {
@@ -165,12 +106,7 @@
       title.className = "template-option-title";
       title.textContent = s.title;
 
-      const snip = document.createElement("span");
-      snip.className = "template-option-snippet";
-      snip.textContent = firstMeaningfulLine(s.body);
-
       btn.appendChild(title);
-      btn.appendChild(snip);
       btn.addEventListener("click", () => selectTemplate(i));
       templatePickerEl.appendChild(btn);
     });
@@ -189,13 +125,8 @@
     subjectField.focus();
   }
 
-  function buildBody(messageText, senderEmail) {
-    const contact = senderEmail.trim();
-    const header =
-      contact.length > 0
-        ? `Sender contact email: ${contact}\n\n---\n\n`
-        : "";
-    return header + messageText.trim();
+  function buildBody(messageText) {
+    return messageText.trim();
   }
 
   function buildMailto(recipientAddr, subject, body) {
@@ -239,15 +170,8 @@
       return;
     }
 
-    const senderEmail = senderSelect.value.trim();
-    if (!senderEmail) {
-      setStatus("Choose a contact email.", true);
-      senderSelect.focus();
-      return;
-    }
-
     const subjectLine = subjectField.value.trim() || site.defaultSubject;
-    const body = buildBody(bodyText, senderEmail);
+    const body = buildBody(bodyText);
     const href = buildMailto(site.recipientEmail, subjectLine, body);
 
     if (href.length > 2000) {

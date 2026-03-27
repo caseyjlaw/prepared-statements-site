@@ -5,15 +5,11 @@
   "statements": [
     {
       "title": "Placeholder: Please Keep Our Streets Safe",
-      "body": "We need to preserve safety features. Please do that.\n\nThank you."
+      "body": "Dear Councilmembers,\n\nWe need to preserve safety features. Please do that.\n\nThank you."
     },
     {
       "title": "Placeholder: We Need Safe Routes to School",
-      "body": "Children need safe routes to school. When our streets only consider cars, they are not safe and do not support childhood independence.\n\nThank you."
+      "body": "Dear Councilmembers,\n\nChildren need safe routes to school. When our streets only consider cars, they are not safe and do not support childhood independence.\n\nThank you."
     }
-  ],
-  "emailAddressOptions": {
-    "options": ["test@southpasadenaca.gov"],
-    "default": "test@southpasadenaca.gov"
-  }
+  ]
 }
