@@ -10,36 +10,42 @@
     <div class="wrap">
       <header>
         <h1>Prepared statements</h1>
-        <p class="lead">
-          Pick a statement, add your email, then send the composed message from your own mail app.
-        </p>
+        <p class="lead">Send advocacy messages through your mail app using ready-made templates.</p>
       </header>
 
       <main class="card">
+        <p id="advocacy-headline" class="advocacy-headline"></p>
+
+        <div id="form-instructions" class="form-instructions" aria-label="How to use this form"></div>
+
         <div class="field">
+          <span id="template-picker-label" class="field-label-static">Templates</span>
           <div
-            id="statement-list"
-            class="statement-list"
-            aria-label="Available statements"
+            id="template-picker"
+            class="template-picker"
+            role="group"
+            aria-labelledby="template-picker-label"
             hidden
           ></div>
-          <label for="statement">Statement</label>
-          <select id="statement" aria-describedby="preview-intro"></select>
-          <p class="preview-label">Preview (first line)</p>
-          <p id="intro" class="preview" aria-live="polite"></p>
         </div>
 
         <div class="field">
-          <label for="email">Your email</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autocomplete="email"
-            inputmode="email"
-            placeholder="you@example.com"
-            required
-          />
+          <label for="message">Your message</label>
+          <textarea
+            id="message"
+            name="message"
+            rows="10"
+            spellcheck="true"
+            placeholder="Choose a template above, or type your message here."
+          ></textarea>
+        </div>
+
+        <div class="field">
+          <label for="sender-email">Contact email</label>
+          <select id="sender-email" name="sender-email" aria-describedby="sender-email-hint"></select>
+          <p id="sender-email-hint" class="field-hint">
+            Preset address included with your message so the recipient can reply.
+          </p>
         </div>
 
         <div class="actions">
@@ -53,8 +59,7 @@
       </main>
 
       <footer>
-        Content is defined in <code>statements.md</code>. Recipient address is set in
-        <code>config.js</code>.
+        Templates: <code>statements.md</code>. Recipient and options: <code>config.js</code>.
       </footer>
     </div>
 

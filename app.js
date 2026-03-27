@@ -2,17 +2,63 @@
   const cfg = window.PREPARED_STATEMENTS_CONFIG || {};
   const recipient = cfg.recipientEmail || "you@example.com";
   const defaultSubject = cfg.defaultSubject || "Prepared statement";
+  const advocacyHeadline =
+    cfg.advocacyHeadline || "Placeholder: Let Your Representatives Know How You Feel";
+  const formInstructions = Array.isArray(cfg.formInstructions)
+    ? cfg.formInstructions
+    : [
+        typeof cfg.formInstructions === "string"
+          ? cfg.formInstructions
+          : "Click a template to load it, edit if needed, choose a contact email, then send.",
+      ];
 
-  const statementSelect = document.getElementById("statement");
-  const emailInput = document.getElementById("email");
+  const senderOptionsRaw = cfg.senderEmailOptions;
+  const senderOptions = Array.isArray(senderOptionsRaw) && senderOptionsRaw.length > 0
+    ? senderOptionsRaw.map(String)
+    : ["test@southpasadenaca.gov"];
+  const defaultSender =
+    cfg.defaultSenderEmail && senderOptions.includes(cfg.defaultSenderEmail)
+      ? cfg.defaultSenderEmail
+      : senderOptions[0];
+
+  const messageField = document.getElementById("message");
+  const senderSelect = document.getElementById("sender-email");
   const composeBtn = document.getElementById("compose");
   const statusEl = document.getElementById("status");
-  const introEl = document.getElementById("intro");
-  const statementListEl = document.getElementById("statement-list");
+  const templatePickerEl = document.getElementById("template-picker");
+  const advocacyEl = document.getElementById("advocacy-headline");
+  const instructionsEl = document.getElementById("form-instructions");
+
+  let activeTemplateIndex = null;
 
   function setStatus(message, isError) {
     statusEl.textContent = message;
     statusEl.classList.toggle("error", Boolean(isError));
+  }
+
+  function applyCopyFromConfig() {
+    if (advocacyEl) {
+      advocacyEl.textContent = advocacyHeadline;
+    }
+    if (instructionsEl) {
+      instructionsEl.innerHTML = "";
+      formInstructions.forEach((line) => {
+        const p = document.createElement("p");
+        p.textContent = line;
+        instructionsEl.appendChild(p);
+      });
+    }
+  }
+
+  function populateSenderSelect() {
+    senderSelect.innerHTML = "";
+    senderOptions.forEach((addr) => {
+      const opt = document.createElement("option");
+      opt.value = addr;
+      opt.textContent = addr;
+      senderSelect.appendChild(opt);
+    });
+    senderSelect.value = defaultSender;
   }
 
   function parseStatements(markdown) {
@@ -49,45 +95,54 @@
     return statements;
   }
 
-  function populateSelect(statements) {
-    statementSelect.innerHTML = "";
+  function firstMeaningfulLine(body) {
+    const line = body.split(/\r?\n/).find((l) => l.trim().length > 0);
+    return (line || body).trim();
+  }
+
+  function populateTemplatePicker(statements) {
+    if (!templatePickerEl) return;
+    templatePickerEl.innerHTML = "";
     statements.forEach((s, i) => {
-      const opt = document.createElement("option");
-      opt.value = String(i);
-      opt.textContent = s.title;
-      statementSelect.appendChild(opt);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "template-option";
+      btn.dataset.index = String(i);
+
+      const title = document.createElement("span");
+      title.className = "template-option-title";
+      title.textContent = s.title;
+
+      const snip = document.createElement("span");
+      snip.className = "template-option-snippet";
+      snip.textContent = firstMeaningfulLine(s.body);
+
+      btn.appendChild(title);
+      btn.appendChild(snip);
+      btn.addEventListener("click", () => selectTemplate(i));
+      templatePickerEl.appendChild(btn);
     });
+    templatePickerEl.hidden = false;
   }
 
-  function populateStatementList(statements) {
-    if (!statementListEl) return;
-    statementListEl.innerHTML = "";
-    statements.forEach((s) => {
-      const item = document.createElement("div");
-      item.className = "statement-list-item";
-
-      const label = document.createElement("span");
-      label.className = "statement-list-label";
-      label.textContent = s.title;
-
-      const body = document.createElement("p");
-      body.className = "statement-list-body";
-      body.textContent = s.body;
-
-      item.appendChild(label);
-      item.appendChild(body);
-      statementListEl.appendChild(item);
+  function selectTemplate(index) {
+    const list = window.__STATEMENTS__;
+    if (!list || !list[index]) return;
+    activeTemplateIndex = index;
+    messageField.value = list[index].body;
+    templatePickerEl.querySelectorAll(".template-option").forEach((el, idx) => {
+      el.classList.toggle("is-selected", idx === index);
     });
-    statementListEl.hidden = false;
+    messageField.focus();
   }
 
-  function buildBody(template, userEmail) {
-    const contact = userEmail.trim();
+  function buildBody(messageText, senderEmail) {
+    const contact = senderEmail.trim();
     const header =
       contact.length > 0
         ? `Sender contact email: ${contact}\n\n---\n\n`
         : "";
-    return header + template;
+    return header + messageText.trim();
   }
 
   function buildMailto(recipientAddr, subject, body) {
@@ -105,8 +160,21 @@
     a.remove();
   }
 
+  function subjectForCompose() {
+    const list = window.__STATEMENTS__;
+    if (
+      activeTemplateIndex !== null &&
+      list &&
+      list[activeTemplateIndex] &&
+      list[activeTemplateIndex].title
+    ) {
+      return `${defaultSubject}: ${list[activeTemplateIndex].title}`;
+    }
+    return defaultSubject;
+  }
+
   async function loadStatements() {
-    setStatus("Loading statements…", false);
+    setStatus("Loading templates…", false);
     const res = await fetch("statements.md", { cache: "no-store" });
     if (!res.ok) {
       throw new Error(`Could not load statements.md (${res.status}).`);
@@ -114,58 +182,40 @@
     const text = await res.text();
     const statements = parseStatements(text);
     window.__STATEMENTS__ = statements;
-    populateSelect(statements);
-    populateStatementList(statements);
-
-    const first = statements[0];
-    if (introEl && first) {
-      introEl.textContent = first.body.split("\n")[0] || "";
-    }
-
-    statementSelect.addEventListener("change", () => {
-      const idx = Number.parseInt(statementSelect.value, 10);
-      const s = window.__STATEMENTS__[idx];
-      if (introEl && s) {
-        introEl.textContent = s.body.split("\n")[0] || "";
-      }
-    });
-
-    setStatus("Choose a statement and enter your email, then open your mail app.", false);
+    populateTemplatePicker(statements);
+    setStatus("Choose a template (optional), edit your message, then open your mail app.", false);
   }
 
+  applyCopyFromConfig();
+  populateSenderSelect();
+
   composeBtn.addEventListener("click", () => {
-    const list = window.__STATEMENTS__;
-    if (!list || list.length === 0) {
-      setStatus("Statements are not loaded yet.", true);
+    if (!window.__STATEMENTS__ || window.__STATEMENTS__.length === 0) {
+      setStatus("Templates are not loaded yet.", true);
       return;
     }
 
-    const idx = Number.parseInt(statementSelect.value, 10);
-    const chosen = list[idx];
-    const userEmail = emailInput.value.trim();
-
-    if (!userEmail) {
-      setStatus("Please enter your email address.", true);
-      emailInput.focus();
+    const bodyText = messageField.value.trim();
+    if (!bodyText) {
+      setStatus("Add a message (pick a template or type your own).", true);
+      messageField.focus();
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail)) {
-      setStatus("That does not look like a valid email address.", true);
-      emailInput.focus();
+    const senderEmail = senderSelect.value.trim();
+    if (!senderEmail) {
+      setStatus("Choose a contact email.", true);
+      senderSelect.focus();
       return;
     }
 
-    const subject =
-      chosen && chosen.title
-        ? `${defaultSubject}: ${chosen.title}`
-        : defaultSubject;
-    const body = buildBody(chosen.body, userEmail);
+    const subject = subjectForCompose();
+    const body = buildBody(bodyText, senderEmail);
     const href = buildMailto(recipient, subject, body);
 
     if (href.length > 2000) {
       setStatus(
-        "The composed message is very long; your mail app might truncate it. Consider shortening the template.",
+        "The composed message is very long; your mail app might truncate it. Consider shortening the text.",
         true
       );
     } else {
@@ -177,6 +227,6 @@
 
   loadStatements().catch((err) => {
     console.error(err);
-    setStatus(err.message || "Failed to load statements.", true);
+    setStatus(err.message || "Failed to load templates.", true);
   });
 })();
