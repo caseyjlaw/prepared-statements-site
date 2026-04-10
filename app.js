@@ -155,7 +155,7 @@
     const parsed = parseSiteJson(text);
     applySiteData(parsed);
     populateTemplatePicker(window.__STATEMENTS__);
-    setStatus("Ready when you are — pick a template or write your message, then send.", false);
+    setStatus("Pick a template from the set above or write your message, then click the button below to send the email.", false);
   }
 
   composeBtn.addEventListener("click", () => {
