@@ -1,18 +1,22 @@
 {
-  "advocacyHeadline": "🚲🌳✨ Placeholder: Let your representatives know how you feel — safer complete streets, walkable neighborhoods, and car-free ways of living build healthier, happier communities. You’ve got this!",
-  "recipientEmail": "you@example.com",
-  "defaultSubject": "Public comment",
+  "advocacyHeadline": "\ud83d\udeb2\ud83c\udf33 Middle and high school students deserve streets where we can walk, bike, and roll to school without fear. Your voice matters — tell leaders why safe routes and active transportation should be a priority.",
+  "recipientEmail": "ccpubliccomment@southpasadenaca.gov",
+  "defaultSubject": "Public comment: Safe routes to school (student)",
   "statements": [
     {
-      "title": "Placeholder: Please Keep Our Streets Safe",
-      "body": "Dear Councilmembers,\n\nWe need to preserve safety features. Please do that.\n\nThank you."
+      "title": "We need safer streets so we can get to school on our own",
+      "body": "Dear Councilmembers,\n\nI am a middle/high school student in South Pasadena. Many of us want to walk or bike to school, but fast traffic and poor quality bike lanes make that feel unsafe. We are asking you to prioritize designs that slow cars, shorten crossings, and give people on foot and on bikes clear, connected routes all the way to school.\n\nWhen streets are safer, more of us can choose active transportation — and our families worry less.\n\n"
     },
     {
-      "title": "Placeholder: We Need Safe Routes to School",
-      "body": "Dear Councilmembers,\n\nChildren need safe routes to school. When our streets only consider cars, they are not safe and do not support childhood independence.\n\nThank you."
+      "title": "Safe routes to school should work for everyone, not just drivers",
+      "body": "Dear Councilmembers,\n\nI am writing as a student. My friends and I should be able to get to school by walking, biking, or scooting without having to compete with rush-hour cut-through traffic. Routes near schools need good crosswalks and protection at intersections — not just more room for cars.\n\nPlease treat routes to our middle and high schools as essential infrastructure for youth, the same way we treat car lanes for commuters.\n\n"
     },
     {
-      "title": "Draft your own message from scratch",
+      "title": "Walking and biking to school cuts pollution — we need safe routes to make that real",
+      "body": "Dear Councilmembers,\n\nAs a SPUSD student, I constantly hear about the need to act to stop climate change. The city has an opportunity to do that by redesigning Fremont Avenue to be safer for walking and biking. When more of us can walk, bike, or roll to school safely, we reduce the car emissions that cause climate change and bad air quality.\n\n Students will use new sidewalks and bike lanes — and our community's carbon footprint will go down.\n\n"
+    },
+    {
+      "title": "Write your own message",
       "body": "Dear Councilmembers,\n\n"
     }
   ]
