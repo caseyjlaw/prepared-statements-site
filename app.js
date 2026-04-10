@@ -3,10 +3,10 @@
   const DATA_URL = cfg.dataUrl || "statements.json";
 
   const FALLBACK = {
-    recipientEmail: "you@example.com",
-    defaultSubject: "Complete streets advocacy",
+    recipientEmail: "ccpubliccomment@southpasadenaca.gov",
+    defaultSubject: "Public comment",
     advocacyHeadline:
-      "🚲🌳✨ Let your representatives know — complete streets & car-free living matter!",
+      "Public comment",
     statements: [],
   };
 
