@@ -4,7 +4,7 @@
 
   const FALLBACK = {
     recipientEmail: "ccpubliccomment@southpasadenaca.gov",
-    defaultSubject: "Public comment",
+    defaultSubject: "Public comment on Item 21 of May 6th",
     advocacyHeadline:
       "Public comment",
     statements: [],
