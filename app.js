@@ -5,8 +5,8 @@
   const FALLBACK = {
     recipientEmail: "ccpubliccomment@southpasadenaca.gov",
     defaultSubject: "Huntington and Fremont are for Everyone",
-    advocacyHeadline:
-      "Huntington and Fremont are for Everyone",
+    advocacyHeadline: "Huntington and Fremont are for Everyone",
+    advocacyIntro: "",
     statements: [],
   };
 
@@ -14,6 +14,7 @@
     recipientEmail: FALLBACK.recipientEmail,
     defaultSubject: FALLBACK.defaultSubject,
     advocacyHeadline: FALLBACK.advocacyHeadline,
+    advocacyIntro: FALLBACK.advocacyIntro,
   };
 
   const messageField = document.getElementById("message");
@@ -22,15 +23,20 @@
   const statusEl = document.getElementById("status");
   const templatePickerEl = document.getElementById("template-picker");
   const advocacyEl = document.getElementById("advocacy-headline");
+  const advocacyIntroEl = document.getElementById("advocacy-intro");
 
   function setStatus(message, isError) {
     statusEl.textContent = message;
     statusEl.classList.toggle("error", Boolean(isError));
   }
 
-  function applyAdvocacyHeadline() {
+  function applyAdvocacyCopy() {
     if (advocacyEl) {
       advocacyEl.textContent = site.advocacyHeadline;
+    }
+    if (advocacyIntroEl) {
+      advocacyIntroEl.textContent = site.advocacyIntro;
+      advocacyIntroEl.hidden = !site.advocacyIntro;
     }
   }
 
@@ -72,6 +78,10 @@
         typeof data.advocacyHeadline === "string" && data.advocacyHeadline.trim()
           ? data.advocacyHeadline.trim()
           : FALLBACK.advocacyHeadline,
+      advocacyIntro:
+        typeof data.advocacyIntro === "string" && data.advocacyIntro.trim()
+          ? data.advocacyIntro.trim()
+          : FALLBACK.advocacyIntro,
       recipientEmail:
         typeof data.recipientEmail === "string" && data.recipientEmail.trim()
           ? data.recipientEmail.trim()
@@ -86,11 +96,12 @@
 
   function applySiteData(parsed) {
     site.advocacyHeadline = cfg.advocacyHeadline ?? parsed.advocacyHeadline;
+    site.advocacyIntro = cfg.advocacyIntro ?? parsed.advocacyIntro;
     site.recipientEmail = cfg.recipientEmail ?? parsed.recipientEmail;
     site.defaultSubject = cfg.defaultSubject ?? parsed.defaultSubject;
 
     window.__STATEMENTS__ = parsed.statements;
-    applyAdvocacyHeadline();
+    applyAdvocacyCopy();
   }
 
   function populateTemplatePicker(statements) {
