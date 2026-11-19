@@ -4,9 +4,9 @@
 
   const FALLBACK = {
     recipientEmail: "ccpubliccomment@southpasadenaca.gov",
-    defaultSubject: "Public comment on Item 21 of May 6th",
+    defaultSubject: "Huntington and Fremont are for Everyone",
     advocacyHeadline:
-      "Public comment",
+      "Huntington and Fremont are for Everyone",
     statements: [],
   };
 

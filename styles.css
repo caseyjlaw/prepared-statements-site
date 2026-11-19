@@ -100,7 +100,7 @@ label {
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--bg);
-  max-height: min(42vh, 18rem);
+  max-height: min(50vh, 24rem);
   overflow-y: auto;
 }
 
