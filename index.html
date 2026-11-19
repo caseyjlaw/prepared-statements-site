@@ -13,38 +13,22 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="bg-layer" aria-hidden="true">
+      <img class="bg-hero" src="assets/hero-left.png" alt="" />
+      <img class="bg-logo" src="assets/logo.png" alt="" />
+    </div>
+
     <div class="wrap">
       <header class="advocacy-header">
-        <div class="brand-bar">
-          <img
-            class="brand-logo"
-            src="assets/logo.png"
-            alt="South Pas Active"
-            width="330"
-            height="236"
-          />
-        </div>
-        <div class="hero-layout">
-          <img
-            class="hero-photo"
-            src="assets/hero-left.png"
-            alt="Community bike bus with kids, families, and a Come Join Bike Bus sign"
-            width="703"
-            height="476"
-          />
-          <div class="hero-copy">
-            <h1 id="advocacy-headline" class="advocacy-hero"></h1>
-            <p id="advocacy-intro" class="advocacy-intro"></p>
-          </div>
-        </div>
+        <h1 id="advocacy-headline" class="advocacy-hero"></h1>
+        <p id="advocacy-intro" class="advocacy-intro"></p>
       </header>
 
       <main class="workflow">
         <section class="step-card" aria-labelledby="step-1-label">
-          <div class="step-heading">
-            <span class="step-number" aria-hidden="true">1</span>
-            <h2 id="step-1-label" class="step-title">Select a message template</h2>
-          </div>
+          <h2 id="step-1-label" class="step-title">
+            <span class="step-number">1</span> Select a message template
+          </h2>
           <div
             id="template-picker"
             class="template-picker"
@@ -56,13 +40,9 @@
         </section>
 
         <section class="step-card" aria-labelledby="step-2-label">
-          <div class="step-heading">
-            <span class="step-number" aria-hidden="true">2</span>
-            <h2 id="step-2-label" class="step-title">Click to load</h2>
-          </div>
-          <button type="button" id="load-template" class="btn-load" disabled>
-            Load selected template into draft
-          </button>
+          <h2 id="step-2-label" class="step-title">
+            <span class="step-number">2</span> Customize your draft
+          </h2>
           <div class="draft-fields">
             <div class="field">
               <label for="email-subject">Subject line</label>
@@ -71,7 +51,7 @@
                 name="email-subject"
                 type="text"
                 autocomplete="off"
-                placeholder="Load a template, then edit the subject if you like."
+                placeholder="Select a template above, then edit the subject if you like."
               />
             </div>
             <div class="field field-last">
@@ -81,21 +61,19 @@
                 name="message"
                 rows="10"
                 spellcheck="true"
-                placeholder="Your loaded template will appear here."
+                placeholder="Your selected template will appear here."
               ></textarea>
             </div>
           </div>
         </section>
 
         <section class="step-card step-card-send" aria-labelledby="step-3-label">
-          <div class="step-heading">
-            <span class="step-number" aria-hidden="true">3</span>
-            <h2 id="step-3-label" class="step-title">Send with your email client</h2>
-          </div>
+          <h2 id="step-3-label" class="step-title">
+            <span class="step-number">3</span> Send with your email client
+          </h2>
           <div class="actions">
             <button type="button" id="compose" class="btn-send">
               <span class="btn-send-main">Send email</span>
-              <span class="btn-send-note">Opens your mail app with this message ready to send</span>
             </button>
           </div>
         </section>
