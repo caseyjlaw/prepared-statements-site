@@ -20,10 +20,13 @@
   const messageField = document.getElementById("message");
   const subjectField = document.getElementById("email-subject");
   const composeBtn = document.getElementById("compose");
+  const loadBtn = document.getElementById("load-template");
   const statusEl = document.getElementById("status");
   const templatePickerEl = document.getElementById("template-picker");
+  const selectedTemplateLabelEl = document.getElementById("selected-template-label");
   const advocacyEl = document.getElementById("advocacy-headline");
   const advocacyIntroEl = document.getElementById("advocacy-intro");
+  let selectedIndex = null;
 
   function setStatus(message, isError) {
     statusEl.textContent = message;
@@ -112,6 +115,8 @@
       btn.type = "button";
       btn.className = "template-option";
       btn.dataset.index = String(i);
+      btn.setAttribute("role", "option");
+      btn.setAttribute("aria-selected", "false");
 
       const title = document.createElement("span");
       title.className = "template-option-title";
@@ -127,14 +132,35 @@
   function selectTemplate(index) {
     const list = window.__STATEMENTS__;
     if (!list || !list[index]) return;
-    const st = list[index];
-    const useDefaultSubject = index === list.length - 1;
+    selectedIndex = index;
+    templatePickerEl.querySelectorAll(".template-option").forEach((el, idx) => {
+      const isSelected = idx === index;
+      el.classList.toggle("is-selected", isSelected);
+      el.setAttribute("aria-selected", isSelected ? "true" : "false");
+    });
+    if (selectedTemplateLabelEl) {
+      selectedTemplateLabelEl.hidden = false;
+      selectedTemplateLabelEl.textContent = `Selected: ${list[index].title}`;
+    }
+    if (loadBtn) {
+      loadBtn.disabled = false;
+      loadBtn.focus();
+    }
+    setStatus("Step 2: Click “Load selected template into draft,” then customize your message.", false);
+  }
+
+  function loadSelectedTemplate() {
+    const list = window.__STATEMENTS__;
+    if (selectedIndex === null || !list || !list[selectedIndex]) {
+      setStatus("Step 1: Select a message template first.", true);
+      return;
+    }
+    const st = list[selectedIndex];
+    const useDefaultSubject = selectedIndex === list.length - 1;
     subjectField.value = useDefaultSubject ? site.defaultSubject : st.title;
     messageField.value = st.body;
-    templatePickerEl.querySelectorAll(".template-option").forEach((el, idx) => {
-      el.classList.toggle("is-selected", idx === index);
-    });
-    subjectField.focus();
+    messageField.focus();
+    setStatus("Step 3: Customize if you like, then send with your email client.", false);
   }
 
   function buildBody(messageText) {
@@ -166,7 +192,11 @@
     const parsed = parseSiteJson(text);
     applySiteData(parsed);
     populateTemplatePicker(window.__STATEMENTS__);
-    setStatus("Pick a template from the set above or write your message, then click the button below to send the email.", false);
+    setStatus("Step 1: Select a message template.", false);
+  }
+
+  if (loadBtn) {
+    loadBtn.addEventListener("click", loadSelectedTemplate);
   }
 
   composeBtn.addEventListener("click", () => {
@@ -177,8 +207,13 @@
 
     const bodyText = messageField.value.trim();
     if (!bodyText) {
-      setStatus("Add a message (use a template or write your own).", true);
-      messageField.focus();
+      setStatus("Step 2: Load a template into the draft first (or write your own message).", true);
+      if (loadBtn && !loadBtn.disabled) {
+        loadBtn.focus();
+      } else if (templatePickerEl) {
+        const first = templatePickerEl.querySelector(".template-option");
+        if (first) first.focus();
+      }
       return;
     }
 
