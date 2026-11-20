@@ -28,7 +28,6 @@
   const advocacyEl = document.getElementById("advocacy-headline");
   const advocacyIntroEl = document.getElementById("advocacy-intro");
   let selectedCouncilEmail = null;
-  let lastMeetParagraph = null;
 
   function setStatus(message, isError) {
     statusEl.textContent = message;
@@ -149,10 +148,6 @@
 
     subjectField.value = useDefaultSubject ? site.defaultSubject : st.title;
     messageField.value = st.body;
-    lastMeetParagraph = null;
-    selectedCouncilEmail = null;
-    if (ccField) ccField.value = "";
-    updateCouncilSelection(null, 0);
     messageField.focus();
     setStatus("", false);
   }
@@ -161,38 +156,13 @@
     return messageText.trim();
   }
 
-  function buildMeetRequest(name, district) {
-    return (
-      "I would also like to request a meeting with " +
-      name +
-      " (District " +
-      district +
-      ") to discuss making Huntington and Fremont safer and more accessible."
-    );
-  }
-
-  function upsertMeetRequest(name, district) {
-    const paragraph = buildMeetRequest(name, district);
-    let current = messageField.value;
-
-    if (lastMeetParagraph && current.includes(lastMeetParagraph)) {
-      current = current.replace(lastMeetParagraph, paragraph);
-    } else {
-      const base = current.trim();
-      current = (base ? base + "\n\n" : "") + paragraph + "\n";
-    }
-
-    lastMeetParagraph = paragraph;
-    messageField.value = current;
-  }
-
-  function updateCouncilSelection(email, stage) {
+  function updateCouncilSelection(email) {
     if (!councilListEl) return;
     councilListEl.querySelectorAll(".council-option").forEach((btn) => {
       const isSelected = btn.dataset.email === email;
       const hint = btn.querySelector(".council-hint");
-      btn.classList.toggle("is-drafted", isSelected && stage >= 1);
-      btn.classList.toggle("is-cc-filled", isSelected && stage >= 2);
+      btn.classList.toggle("is-cc-filled", isSelected);
+      btn.classList.remove("is-drafted");
       if (!hint) return;
       if (!isSelected) {
         hint.hidden = true;
@@ -200,35 +170,20 @@
         return;
       }
       hint.hidden = false;
-      hint.textContent =
-        stage >= 2
-          ? "Cc filled — ready to send"
-          : "Meeting request added — click again to fill Cc";
+      hint.textContent = "Cc filled";
     });
   }
 
   function handleCouncilClick(btn) {
     const email = btn.dataset.email;
-    const name = btn.dataset.name;
-    const district = btn.dataset.district;
-    if (!email || !name || !district) return;
+    if (!email) return;
 
-    if (selectedCouncilEmail !== email) {
-      selectedCouncilEmail = email;
-      upsertMeetRequest(name, district);
-      if (ccField) ccField.value = "";
-      updateCouncilSelection(email, 1);
-      messageField.focus();
-      setStatus("", false);
-      return;
-    }
-
-    // Second click on the same council member fills Cc.
+    selectedCouncilEmail = email;
     if (ccField) {
       ccField.value = email;
       ccField.focus();
     }
-    updateCouncilSelection(email, 2);
+    updateCouncilSelection(email);
     setStatus("", false);
   }
 
