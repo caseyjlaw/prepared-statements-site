@@ -19,12 +19,16 @@
 
   const messageField = document.getElementById("message");
   const subjectField = document.getElementById("email-subject");
+  const ccField = document.getElementById("email-cc");
   const composeBtn = document.getElementById("compose");
   const statusEl = document.getElementById("status");
   const templatePickerEl = document.getElementById("template-picker");
   const selectedTemplateLabelEl = document.getElementById("selected-template-label");
+  const councilListEl = document.getElementById("council-list");
   const advocacyEl = document.getElementById("advocacy-headline");
   const advocacyIntroEl = document.getElementById("advocacy-intro");
+  let selectedCouncilEmail = null;
+  let lastMeetParagraph = null;
 
   function setStatus(message, isError) {
     statusEl.textContent = message;
@@ -145,6 +149,10 @@
 
     subjectField.value = useDefaultSubject ? site.defaultSubject : st.title;
     messageField.value = st.body;
+    lastMeetParagraph = null;
+    selectedCouncilEmail = null;
+    if (ccField) ccField.value = "";
+    updateCouncilSelection(null, 0);
     messageField.focus();
     setStatus("", false);
   }
@@ -153,10 +161,85 @@
     return messageText.trim();
   }
 
-  function buildMailto(recipientAddr, subject, body) {
-    const s = encodeURIComponent(subject);
-    const b = encodeURIComponent(body);
-    return `mailto:${recipientAddr}?subject=${s}&body=${b}`;
+  function buildMeetRequest(name, district) {
+    return (
+      "I would also like to request a meeting with " +
+      name +
+      " (District " +
+      district +
+      ") to discuss making Huntington and Fremont safer and more accessible."
+    );
+  }
+
+  function upsertMeetRequest(name, district) {
+    const paragraph = buildMeetRequest(name, district);
+    let current = messageField.value;
+
+    if (lastMeetParagraph && current.includes(lastMeetParagraph)) {
+      current = current.replace(lastMeetParagraph, paragraph);
+    } else {
+      const base = current.trim();
+      current = (base ? base + "\n\n" : "") + paragraph + "\n";
+    }
+
+    lastMeetParagraph = paragraph;
+    messageField.value = current;
+  }
+
+  function updateCouncilSelection(email, stage) {
+    if (!councilListEl) return;
+    councilListEl.querySelectorAll(".council-option").forEach((btn) => {
+      const isSelected = btn.dataset.email === email;
+      const hint = btn.querySelector(".council-hint");
+      btn.classList.toggle("is-drafted", isSelected && stage >= 1);
+      btn.classList.toggle("is-cc-filled", isSelected && stage >= 2);
+      if (!hint) return;
+      if (!isSelected) {
+        hint.hidden = true;
+        hint.textContent = "";
+        return;
+      }
+      hint.hidden = false;
+      hint.textContent =
+        stage >= 2
+          ? "Cc filled — ready to send"
+          : "Meeting request added — click again to fill Cc";
+    });
+  }
+
+  function handleCouncilClick(btn) {
+    const email = btn.dataset.email;
+    const name = btn.dataset.name;
+    const district = btn.dataset.district;
+    if (!email || !name || !district) return;
+
+    if (selectedCouncilEmail !== email) {
+      selectedCouncilEmail = email;
+      upsertMeetRequest(name, district);
+      if (ccField) ccField.value = "";
+      updateCouncilSelection(email, 1);
+      messageField.focus();
+      setStatus("", false);
+      return;
+    }
+
+    // Second click on the same council member fills Cc.
+    if (ccField) {
+      ccField.value = email;
+      ccField.focus();
+    }
+    updateCouncilSelection(email, 2);
+    setStatus("", false);
+  }
+
+  function buildMailto(recipientAddr, subject, body, ccAddr) {
+    const params = [];
+    params.push("subject=" + encodeURIComponent(subject));
+    if (ccAddr) {
+      params.push("cc=" + encodeURIComponent(ccAddr));
+    }
+    params.push("body=" + encodeURIComponent(body));
+    return `mailto:${recipientAddr}?${params.join("&")}`;
   }
 
   function openMailto(href) {
@@ -188,7 +271,7 @@
 
     const bodyText = messageField.value.trim();
     if (!bodyText) {
-      setStatus("Step 1: Select a message template first (or write your own message).", true);
+      setStatus("Step 1a: Select a message template first (or write your own message).", true);
       if (templatePickerEl) {
         const first = templatePickerEl.querySelector(".template-option");
         if (first) first.focus();
@@ -198,7 +281,8 @@
 
     const subjectLine = subjectField.value.trim() || site.defaultSubject;
     const body = buildBody(bodyText);
-    const href = buildMailto(site.recipientEmail, subjectLine, body);
+    const ccAddr = ccField ? ccField.value.trim() : "";
+    const href = buildMailto(site.recipientEmail, subjectLine, body, ccAddr);
 
     if (href.length > 2000) {
       setStatus(
@@ -211,6 +295,12 @@
 
     openMailto(href);
   });
+
+  if (councilListEl) {
+    councilListEl.querySelectorAll(".council-option").forEach((btn) => {
+      btn.addEventListener("click", () => handleCouncilClick(btn));
+    });
+  }
 
   loadSiteData().catch((err) => {
     console.error(err);

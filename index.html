@@ -25,18 +25,117 @@
       </header>
 
       <main class="workflow">
-        <section class="step-card" aria-labelledby="step-1-label">
-          <h2 id="step-1-label" class="step-title">
-            <span class="step-number">1</span> Select a message template
+        <section class="step-card" aria-labelledby="step-1a-label">
+          <h2 id="step-1a-label" class="step-title">
+            <span class="step-number">1a</span> Select a message template
           </h2>
           <div
             id="template-picker"
             class="template-picker"
             role="listbox"
-            aria-labelledby="step-1-label"
+            aria-labelledby="step-1a-label"
             hidden
           ></div>
           <p id="selected-template-label" class="field-hint step-selection-hint" hidden></p>
+        </section>
+
+        <section class="step-card bonus-card" aria-labelledby="step-1b-label">
+          <h2 id="step-1b-label" class="step-title">
+            <span class="step-number">1b</span> Cc your council member
+            <span class="step-optional">(optional)</span>
+          </h2>
+          <p class="bonus-lead">
+            Find your district on the map. Click your council member once to add a meeting request to your draft.
+            Click the same person again to fill their email into Cc.
+          </p>
+          <img
+            class="district-map"
+            src="assets/council-districts.jpg"
+            alt="Map of South Pasadena City Council districts 1 through 5"
+            width="1200"
+            height="893"
+          />
+          <div id="council-list" class="council-list" role="list">
+            <button
+              type="button"
+              class="council-option"
+              role="listitem"
+              data-district="1"
+              data-name="Omari Ferguson, Mayor Pro Tem"
+              data-email="oferguson@southpasadenaca.gov"
+            >
+              <span class="council-district">District 1</span>
+              <span class="council-name">Omari Ferguson, Mayor Pro Tem</span>
+              <span class="council-email">oferguson@southpasadenaca.gov</span>
+              <span class="council-hint" hidden></span>
+            </button>
+            <button
+              type="button"
+              class="council-option"
+              role="listitem"
+              data-district="2"
+              data-name="Sheila Rossi, Mayor"
+              data-email="srossi@southpasadenaca.gov"
+            >
+              <span class="council-district">District 2</span>
+              <span class="council-name">Sheila Rossi, Mayor</span>
+              <span class="council-email">srossi@southpasadenaca.gov</span>
+              <span class="council-hint" hidden></span>
+            </button>
+            <button
+              type="button"
+              class="council-option"
+              role="listitem"
+              data-district="3"
+              data-name="Jon Primuth, Councilmember"
+              data-email="jprimuth@southpasadenaca.gov"
+            >
+              <span class="council-district">District 3</span>
+              <span class="council-name">Jon Primuth, Councilmember</span>
+              <span class="council-email">jprimuth@southpasadenaca.gov</span>
+              <span class="council-hint" hidden></span>
+            </button>
+            <button
+              type="button"
+              class="council-option"
+              role="listitem"
+              data-district="4"
+              data-name="Michael A. Cacciotti, Councilmember"
+              data-email="mcacciotti@southpasadenaca.gov"
+            >
+              <span class="council-district">District 4</span>
+              <span class="council-name">Michael A. Cacciotti, Councilmember</span>
+              <span class="council-email">mcacciotti@southpasadenaca.gov</span>
+              <span class="council-hint" hidden></span>
+            </button>
+            <button
+              type="button"
+              class="council-option"
+              role="listitem"
+              data-district="5"
+              data-name="Janet Braun, Councilmember"
+              data-email="jbraun@southpasadenaca.gov"
+            >
+              <span class="council-district">District 5</span>
+              <span class="council-name">Janet Braun, Councilmember</span>
+              <span class="council-email">jbraun@southpasadenaca.gov</span>
+              <span class="council-hint" hidden></span>
+            </button>
+          </div>
+          <div class="field field-last">
+            <label for="email-cc">Cc</label>
+            <input
+              id="email-cc"
+              name="email-cc"
+              type="email"
+              autocomplete="off"
+              placeholder="Click your council member twice above to fill this"
+            />
+          </div>
+          <p class="field-hint">
+            Source:
+            <a href="https://www.southpasadenaca.gov/Your-Government/Your-City-Council" rel="noopener noreferrer" target="_blank">South Pasadena City Council</a>
+          </p>
         </section>
 
         <section class="step-card" aria-labelledby="step-2-label">
